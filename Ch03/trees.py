@@ -26,6 +26,7 @@ def calcShannonEnt(dataSet):
     shannonEnt = 0.0
     for key in labelCounts:
         prob = float(labelCounts[key])/numEntries
+        # log函数
         shannonEnt -= prob * log(prob,2) #log base 2
     return shannonEnt
     
@@ -37,7 +38,8 @@ def splitDataSet(dataSet, axis, value):
             reducedFeatVec.extend(featVec[axis+1:])
             retDataSet.append(reducedFeatVec)
     return retDataSet
-    
+
+# 妙啊！！！！
 def chooseBestFeatureToSplit(dataSet):
     numFeatures = len(dataSet[0]) - 1      #the last column is used for the labels
     baseEntropy = calcShannonEnt(dataSet)
@@ -61,14 +63,15 @@ def majorityCnt(classList):
     for vote in classList:
         if vote not in classCount.keys(): classCount[vote] = 0
         classCount[vote] += 1
-    sortedClassCount = sorted(classCount.iteritems(), key=operator.itemgetter(1), reverse=True)
+    sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
     return sortedClassCount[0][0]
 
+# 妙啊
 def createTree(dataSet,labels):
     classList = [example[-1] for example in dataSet]
     if classList.count(classList[0]) == len(classList): 
-        return classList[0]#stop splitting when all of the classes are equal
-    if len(dataSet[0]) == 1: #stop splitting when there are no more features in dataSet
+        return classList[0]     #stop splitting when all of the classes are equal
+    if len(dataSet[0]) == 1:    #stop splitting when there are no more features in dataSet
         return majorityCnt(classList)
     bestFeat = chooseBestFeatureToSplit(dataSet)
     bestFeatLabel = labels[bestFeat]
@@ -94,12 +97,12 @@ def classify(inputTree,featLabels,testVec):
 
 def storeTree(inputTree,filename):
     import pickle
-    fw = open(filename,'w')
+    fw = open(filename,'wb')
     pickle.dump(inputTree,fw)
     fw.close()
     
 def grabTree(filename):
     import pickle
-    fr = open(filename)
+    fr = open(filename,'rb')
     return pickle.load(fr)
     

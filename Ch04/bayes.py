@@ -98,32 +98,45 @@ def testingNB():
 
 def textParse(bigString):    #input is big string, #output is word list
     import re
-    listOfTokens = re.split(r'\W*', bigString)
+    listOfTokens = re.split(r'\W+', bigString)
+    # print(listOfTokens)
     return [tok.lower() for tok in listOfTokens if len(tok) > 2] 
     
 def spamTest():
+    # 导入数据集
     docList=[]; classList = []; fullText =[]
-    for i in range(1,26):
+    for i in list(range(1,26)):
         wordList = textParse(open('email/spam/%d.txt' % i).read())
+        # wordList = textParse(open('email/spam/%d.txt' % i, "rb").read().decode('GBK', 'ignore'))
         docList.append(wordList)
+        # print(open('email/spam/%d.txt' % i).read())
         fullText.extend(wordList)
         classList.append(1)
         wordList = textParse(open('email/ham/%d.txt' % i).read())
+        # wordList = textParse(open('email/ham/%d.txt' % i, "rb").read().decode('GBK', 'ignore'))
         docList.append(wordList)
         fullText.extend(wordList)
         classList.append(0)
     vocabList = createVocabList(docList)#create vocabulary
-    trainingSet = range(50); testSet=[]           #create test set
-    for i in range(10):
+    # 留存交叉验证
+    # trainingSet = range(50); testSet=[]           #create test set
+    trainingSet = list(range(50));
+    testSet = []
+    # for i in range(10):
+    for i in list(range(10)):
         randIndex = int(random.uniform(0,len(trainingSet)))
         testSet.append(trainingSet[randIndex])
         del(trainingSet[randIndex])  
     trainMat=[]; trainClasses = []
+    # 训练
     for docIndex in trainingSet:#train the classifier (get probs) trainNB0
         trainMat.append(bagOfWords2VecMN(vocabList, docList[docIndex]))
         trainClasses.append(classList[docIndex])
     p0V,p1V,pSpam = trainNB0(array(trainMat),array(trainClasses))
+    # 测试
     errorCount = 0
+    # print(docList)
+
     for docIndex in testSet:        #classify the remaining items
         wordVector = bagOfWords2VecMN(vocabList, docList[docIndex])
         if classifyNB(array(wordVector),p0V,p1V,pSpam) != classList[docIndex]:
@@ -137,7 +150,7 @@ def calcMostFreq(vocabList,fullText):
     freqDict = {}
     for token in vocabList:
         freqDict[token]=fullText.count(token)
-    sortedFreq = sorted(freqDict.iteritems(), key=operator.itemgetter(1), reverse=True) 
+    sortedFreq = sorted(freqDict.items(), key=operator.itemgetter(1), reverse=True)
     return sortedFreq[:30]       
 
 def localWords(feed1,feed0):

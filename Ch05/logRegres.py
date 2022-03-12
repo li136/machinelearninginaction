@@ -15,7 +15,11 @@ def loadDataSet():
     return dataMat,labelMat
 
 def sigmoid(inX):
-    return 1.0/(1+exp(-inX))
+    if inX >= 0:
+        return 1.0 / (1 + exp(-inX))
+    else:
+        return exp(inX) / (1 + exp(inX))
+    # return 1.0/(1+exp(-inX))
 
 def gradAscent(dataMatIn, classLabels):
     dataMatrix = mat(dataMatIn)             #convert to NumPy matrix
@@ -83,6 +87,7 @@ def classifyVector(inX, weights):
 
 def colicTest():
     frTrain = open('horseColicTraining.txt'); frTest = open('horseColicTest.txt')
+    # 准备测试集
     trainingSet = []; trainingLabels = []
     for line in frTrain.readlines():
         currLine = line.strip().split('\t')
@@ -91,7 +96,9 @@ def colicTest():
             lineArr.append(float(currLine[i]))
         trainingSet.append(lineArr)
         trainingLabels.append(float(currLine[21]))
+    # 训练
     trainWeights = stocGradAscent1(array(trainingSet), trainingLabels, 1000)
+    # 测试
     errorCount = 0; numTestVec = 0.0
     for line in frTest.readlines():
         numTestVec += 1.0
